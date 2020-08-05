@@ -1,0 +1,344 @@
+SQL> @C:\Users\gokhu\Desktop\ex6.sql
+SQL> drop table order_list;
+
+Table dropped.
+
+SQL> drop table orders;
+
+Table dropped.
+
+SQL> drop table pizza;
+
+Table dropped.
+
+SQL> drop table customer;
+
+Table dropped.
+
+SQL> set serveroutput on;
+SQL> set echo on;
+SQL>
+SQL> Rem:Creating the customer table with cust_id as primary key.
+SQL> create table customer (cust_id varchar2(4) constraint cust_id_pk primary key,
+  2                          cust_name varchar2(20),
+  3                          address varchar2(30),
+  4                          phone number(10));
+
+Table created.
+
+SQL>
+SQL> Rem:Creating the pizza table with pizza_id as primary key.
+SQL> create table pizza (pizza_id varchar2(4) constraint pizza_id_pk primary key,
+  2                          pizza_type varchar2(15),
+  3                          unit_price number(4));
+
+Table created.
+
+SQL>
+SQL> create table orders (order_no varchar2(6) constraint order_no_pk primary key,
+  2  			     cust_id varchar2(5) constraint cust_id_fk references customer(cust_id),
+  3  			     order_date date,
+  4  			     delv_date date,
+  5  			     total_amt number(5),
+  6  			     discount number(2),
+  7  			     bill_amt number(5,1));
+
+Table created.
+
+SQL>
+SQL> Rem:Creating the order_list table with order_no referenced to order_no of order table and
+SQL> Rem: pizza_id referenced to pizza_id of pizza table.
+SQL> create table order_list (order_no varchar2(5) constraint order_no_fk references orders(order_no),
+  2                                pizza_id varchar2(4) constraint pizza_id_fk references pizza(pizza_id),
+  3                                qty number(2),
+  4                                constraint pz_pk4 primary key(order_no,pizza_id));
+
+Table created.
+
+SQL> Rem:Populating Tables
+SQL> @C:\Users\gokhu\Desktop\db\Pizza_DB.sql
+
+
+SQL> Rem:1. Write a stored function to display the total number of pizzas ordered by the given
+SQL> Rem:order number.
+SQL>
+SQL> create or replace function tot_pizza(ord in order_list.order_no%type)
+  2  return order_list.qty%type is
+  3  		 total order_list.qty%type;
+  4  		 num order_list.qty%type;
+  5  		 cursor cur1 is select qty from order_list where order_no=ord;
+  6  	   begin
+  7  		 select count(*) into total from order_list where order_no=ord group by order_no;
+  8  		 total:=0;
+  9  		 open cur1;
+ 10  		 loop
+ 11  		       fetch cur1 into num;
+ 12  		       if(cur1%notfound) then
+ 13  			     exit;
+ 14  		       end if;
+ 15  		       if (num is not NULL) then
+ 16  			     total:=total+num;
+ 17  		       end if;
+ 18  		 end loop;
+ 19  		 close cur1;
+ 20  		 return total;
+ 21  		 exception
+ 22  		       WHEN no_data_found THEN
+ 23  			     dbms_output.put_line('no orders found!!');
+ 24  			     return 0;
+ 25  end;
+ 26  /
+
+Function created.
+
+SQL>
+SQL> Rem:Write a PL/SQL block to calculate bill amount;
+SQL> create or replace procedure bill_amount(ord in order_list.order_no%type) is
+  2  		 total orders.total_amt%type;
+  3  		 disc  orders.discount%type;
+  4  		 bill orders.bill_amt%type;
+  5  		 price pizza.unit_price%type;
+  6  		 id pizza.pizza_id%type;
+  7  		 name pizza.pizza_type%type;
+  8  		 num order_list.qty%type;
+  9  		 serial number(2);
+ 10  		 cursor cur2 is select pizza_id,qty from order_list where order_no=ord;
+ 11  	   begin
+ 12  		 serial:=1;
+ 13  		 select count(*) into total from order_list where order_no=ord group by order_no;
+ 14  		 total:=0;
+ 15  		 dbms_output.put_line('S.no   Type	 Qty	 unit_price  Amount');
+ 16  		 open cur2;
+ 17  		 loop
+ 18  		       fetch cur2 into id,num;
+ 19  		       if(cur2%notfound) then
+ 20  			     exit;
+ 21  		       end if;
+ 22  		       if(num is not NULL) then
+ 23  			     select unit_price,pizza_type into price,name from pizza where pizza_id=id;
+ 24  			     dbms_output.put_line(serial||'      '||name||'    '||num||'	    '||price||' 	'||(num*price));
+ 25  			     total:=total+(num*price);
+ 26  			     serial:=serial+1;
+ 27  		       end if;
+ 28  		 end loop;
+ 29  		 close cur2;
+ 30  		 disc:=0;
+ 31  		 if(total>=2000 and total<5000) then
+ 32  		       disc:=5;
+ 33  		 elsif(total>=5000 and total<10000) then
+ 34  		       disc:=10;
+ 35  		 elsif(total>=10000) then
+ 36  		       disc:=20;
+ 37  		 end if;
+ 38  		 bill:=total-(disc*total/100);
+ 39  		 update orders set total_amt=total,discount=disc,bill_amt=bill where order_no=ord;
+ 40  	   exception
+ 41  		 WHEN no_data_found THEN
+ 42  		       dbms_output.put_line('no orders found!!');
+ 43  end;
+ 44  /
+
+Procedure created.
+
+SQL>
+SQL> Rem:3. For the given order number, write a PL/SQL block to print the order.
+SQL> create or replace procedure bill(ord in order_list.order_no%type) is
+  2  		 id customer.cust_id%type;
+  3  		 name customer.cust_name%type;
+  4  		 phn customer.phone%type;
+  5  		 ordt orders.order_date%type;
+  6  		 total orders.total_amt%type;
+  7  		 disc  orders.discount%type;
+  8  		 bill orders.bill_amt%type;
+  9  		 pz_total order_list.qty%type;
+ 10  		 no number(2);
+ 11  	   begin
+ 12  		 select count(*) into total from order_list where order_no=ord group by order_no;
+ 13  		 select order_date into ordt from orders where order_no=ord;
+ 14  		 select cust_id into id from orders where order_no=ord;
+ 15  		 select cust_name into name from customer where cust_id=id;
+ 16  		 select phone into phn from customer where cust_id=id;
+ 17  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 18  		 dbms_output.put_line('Order No.:'||ord||'   		Name:'||name);
+ 19  		 dbms_output.put_line('Order Date:'||ordt||'   		Phone:'||phn);
+ 20  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 21  		 pz_total:=tot_pizza(ord);
+ 22  		 bill_amount(ord);
+ 23  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 24  		 select total_amt,discount,bill_amt into total,disc,bill from orders where order_no=ord;
+ 25  		 dbms_output.put_line('Total:		 '||pz_total||' 		 Rs.'||total);
+ 26  		 dbms_output.put_line('Discount('||disc||'%):Rs.'||disc/100*total);
+ 27  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 28  		 dbms_output.put_line('Amount to be Paid:Rs.'||bill);
+ 29  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 30  		 dbms_output.put_line('Great Offers! Discount up to 25% on DIWALI Festival Day...');
+ 31  		 dbms_output.put_line('-----------------------------------------------------------------');
+ 32  		 exception
+ 33  		       WHEN no_data_found THEN
+ 34  			     dbms_output.put_line('no orders found!!');
+ 35  end;
+ 36  /
+
+Procedure created.
+
+SQL>
+SQL>
+SQL> Rem: Procedure 1:Case 1
+SQL> declare
+  2  	   tot order_list.qty%type;
+  3  	   ord order_list.order_no%type;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   tot:=tot_pizza(ord);
+  7  	   if(tot!=0) then
+  8  		 dbms_output.put_line('Total No. of pizzas for order '||ord||':'||tot);
+  9  	   end if;
+ 10  end;
+ 11  /
+Enter value for order_no: OP200
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP200';
+Total No. of pizzas for order OP200:16
+
+PL/SQL procedure successfully completed.
+
+SQL>
+SQL> Rem: Procedure 1:Case 2
+SQL> declare
+  2  	   tot order_list.qty%type;
+  3  	   ord order_list.order_no%type;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   tot:=tot_pizza(ord);
+  7  	   if(tot!=0) then
+  8  		 dbms_output.put_line('Total No. of pizzas for order '||ord||':'||tot);
+  9  	   end if;
+ 10  end;
+ 11  /
+Enter value for order_no: OP105
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP105';
+no orders found!!
+
+PL/SQL procedure successfully completed.
+
+SQL>
+SQL>
+SQL> Rem: Procedure 2:Case 1
+SQL> declare
+  2  	   ord order_list.order_no%type;
+  3  	   row orders%rowtype;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   bill_amount(ord);
+  7  end;
+  8  /
+Enter value for order_no: OP400
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP400';
+S.no   Type       Qty     unit_price  Amount
+1      pan        3       130         390
+2      spanish    1       260         260
+
+PL/SQL procedure successfully completed.
+
+
+SQL>
+SQL> Rem: Procedure 2:Case 2
+SQL> declare
+  2  	   ord order_list.order_no%type;
+  3  	   row orders%rowtype;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   bill_amount(ord);
+  7  end;
+  8  /
+Enter value for order_no: OP123
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP123';
+no orders found!!
+
+PL/SQL procedure successfully completed.
+
+SQL>
+SQL>
+
+SQL>
+SQL> Rem: Procedure 3:Case 1
+SQL> declare
+  2  	   ord order_list.order_no%type;
+  3  	   row orders%rowtype;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   bill(ord);
+  7  end;
+  8  /
+Enter value for order_no: OP300
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP300';
+-----------------------------------------------------------------
+Order No.:OP300   		Name:Raj
+Order Date:29-JUN-15   		Phone:9840112003
+-----------------------------------------------------------------
+S.no   Type       Qty     unit_price  Amount
+1      italian    3       200         600
+-----------------------------------------------------------------
+Total:            3                  Rs.600
+Discount(0%):Rs.0
+-----------------------------------------------------------------
+Amount to be Paid:Rs.600
+-----------------------------------------------------------------
+Great Offers! Discount up to 25% on DIWALI Festival Day...
+-----------------------------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+SQL>
+SQL> Rem: Procedure 3:Case 2
+SQL> declare
+  2  	   ord order_list.order_no%type;
+  3  	   row orders%rowtype;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   bill(ord);
+  7  end;
+  8  /
+Enter value for order_no: OP500
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP500';
+-----------------------------------------------------------------
+Order No.:OP500   		Name:Hari
+Order Date:29-JUN-15   		Phone:9001200031
+-----------------------------------------------------------------
+S.no   Type       Qty     unit_price  Amount
+1      italian    6       200         1200
+2      spanish    5       260         1300
+-----------------------------------------------------------------
+Total:            11                  Rs.2500
+Discount(5%):Rs.125
+-----------------------------------------------------------------
+Amount to be Paid:Rs.2375
+-----------------------------------------------------------------
+Great Offers! Discount up to 25% on DIWALI Festival Day...
+-----------------------------------------------------------------
+
+PL/SQL procedure successfully completed.
+
+SQL>
+SQL> Rem: Procedure 3:Case 3
+SQL> declare
+  2  	   ord order_list.order_no%type;
+  3  	   row orders%rowtype;
+  4  begin
+  5  	   ord:='&Order_No.';
+  6  	   bill(ord);
+  7  end;
+  8  /
+Enter value for order_no: OP148
+old   5:       ord:='&Order_No.';
+new   5:       ord:='OP148';
+no orders found!!
+
+PL/SQL procedure successfully completed.
+
+SQL> spool off;

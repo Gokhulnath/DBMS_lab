@@ -1,0 +1,137 @@
+SQL> @C:\Users\gokhu\Desktop\air_cre.sql
+SQL> @C:\Users\gokhu\Desktop\air_pop.sql
+
+SQL> set serveroutput on;
+SQL> set echo on;
+
+SQL>==============================================================================================================================================
+SQL>==============================================================================================================================================
+
+SQL> Rem:1. The date of arrival should be always later than or on the same date of departure
+SQL> CREATE OR REPLACE TRIGGER flight_arrival_date
+  2    BEFORE INSERT OR UPDATE OF flno ON fl_schedule
+  3    FOR EACH ROW
+  4    DECLARE
+  5    BEGIN
+  6     IF :new.arrives < :new.departs THEN
+  7         RAISE_APPLICATION_ERROR(-20002,'The date of arrival should be always later than or on the same date of departure.');
+  8     END IF;
+  9    END;
+ 10    /
+
+Trigger created.
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem:case 1 (same departure and arrival date)
+SQL> INSERT INTO fl_schedule VALUES ('CX-7520','1-may-2022',0730,'1-may-2022',0840,225.43);
+
+1 row created.
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem:case 2 (arrival date if past then departure date)
+SQL> INSERT INTO fl_schedule VALUES ('CX-7520','3-may-2022',0730,'1-may-2022',0840,225.43);
+INSERT INTO fl_schedule VALUES ('CX-7520','3-may-2022',0730,'1-may-2022',0840,225.43)
+            *
+ERROR at line 1:
+ORA-20002: The date of arrival should be always later than or on the same date
+of departure.
+ORA-06512: at "SYSTEM.FLIGHT_ARRIVAL_DATE", line 4
+ORA-04088: error during execution of trigger 'SYSTEM.FLIGHT_ARRIVAL_DATE'
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem:case 3 (arrival date is later than departure date)
+SQL> INSERT INTO fl_schedule VALUES ('CX-7520','5-may-2022',0730,'8-may-2022',0840,225.43);
+
+1 row created.
+
+SQL>==============================================================================================================================================
+SQL>==============================================================================================================================================
+
+SQL> Rem:2. Flight number CX­7520 is scheduled only on Tuesday, Friday and Sunday.
+SQL> CREATE OR REPLACE TRIGGER flightsch_day
+  2    BEFORE INSERT OR UPDATE OF flno ON fl_schedule
+  3    FOR EACH ROW
+  4    WHEN (NEW.flno = 'CX-7520')
+  5    DECLARE
+  6    BEGIN
+  7     IF TO_CHAR(:NEW.departs,'Dy','NLS_DATE_LANGUAGE=English') NOT IN ('Tue','Fri','Sun') THEN
+  8         RAISE_APPLICATION_ERROR(-20000,'Flight number CX­7520 can be scheduled only on Tuesday, Friday and Sunday.');
+  9     END IF;
+ 10    END;
+ 11    /
+
+Trigger created.
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem:case 1 (1-may-2020 is a friday)
+SQL> INSERT INTO fl_schedule VALUES ('CX-7520','1-may-2020',0730,'1-may-2020',0840,225.43);
+
+1 row created.
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem:case 2 (2-may-2020 is a saturday)
+SQL> INSERT INTO fl_schedule VALUES ('CX-7520','2-may-2020',0730,'2-may-2020',0840,225.43);
+INSERT INTO fl_schedule VALUES ('CX-7520','2-may-2020',0730,'2-may-2020',0840,225.43)
+            *
+ERROR at line 1:
+ORA-20000: Flight number CX-7520 can be scheduled only on Tuesday, Friday and
+Sunday.
+ORA-06512: at "SYSTEM.FLIGHTSCH_DAY", line 4
+ORA-04088: error during execution of trigger 'SYSTEM.FLIGHTSCH_DAY'
+
+SQL>==============================================================================================================================================
+SQL>==============================================================================================================================================
+
+SQL> Rem:3. An aircraft is assigned to a flight only if its cruising range is more than the distance of the 
+SQL> Rem:flights’ route.
+SQL> CREATE OR REPLACE TRIGGER crusing_range_distance
+  2      BEFORE INSERT OR UPDATE ON flights
+  3      FOR EACH ROW
+  4      DECLARE
+  5      cruising aircraft.cruisingrange%type;
+  6      dist routes.distance%type;
+  7      cursor cur1 is select cruisingrange from aircraft where aid = :new.aid;
+  8      cursor cur2 is select distance from routes where routeID = :new.rID;
+  9      BEGIN
+ 10      open cur1;
+ 11      open cur2;
+ 12    fetch cur1 into cruising;
+ 13    fetch cur2 into dist;
+ 14    if cruising < dist then
+ 15    RAISE_APPLICATION_ERROR(-20004,'The cruising range must be more than the distance of the flights route.');
+ 16    END IF;
+ 17      close cur1;
+ 18      close cur2;
+ 19      END;
+ 20      /
+
+Trigger created
+
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem: case 1 (13 is Airbus A320 with 2605 cruising range and LC101 is Los Angeles with 1749 distance)
+SQL> INSERT INTO flights VALUES ('WN-435','LC101',13);
+
+1 row created.
+
+
+SQL>-----------------------------------------------------------------------------------------------------------------------------------------------
+
+SQL> Rem: case 2 (13 is Airbus A320 with 2605 cruising range and NYP401 is New York with 3631 distance)
+SQL> INSERT INTO flights VALUES ('WN-436','NYP401',13);
+INSERT INTO flights VALUES ('WN-436','NYP401',13)
+            *
+ERROR at line 1:
+ORA-20004: The cruising range must be more than the distance of the flights
+route.
+ORA-06512: at "SYSTEM.CRUSING_RANGE_DISTANCE", line 12
+ORA-04088: error during execution of trigger 'SYSTEM.CRUSING_RANGE_DISTANCE'
+
+SQL>==============================================================================================================================================
+SQL>==============================================================================================================================================

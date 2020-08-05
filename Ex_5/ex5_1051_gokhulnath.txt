@@ -1,0 +1,691 @@
+SQL> @ C:\Users\gokhu\Desktop\ex5.sql
+SQL> Rem:Droping the table if existed in the database.
+SQL> drop table order_list;
+
+Table dropped.
+
+SQL> drop table orders;
+
+Table dropped.
+
+SQL> drop table pizza;
+
+Table dropped.
+
+SQL> drop table customer;
+
+Table dropped.
+
+SQL> 
+SQL> Rem:Creating the customer table with cust_id as primary key.
+SQL> create table customer (cust_id varchar2(4) constraint cust_id_pk primary key,
+  2  			     cust_name varchar2(20),
+  3  			     address varchar2(30),
+  4  			     phone number(10));
+
+Table created.
+
+SQL> 
+SQL> Rem:Creating the pizza table with pizza_id as primary key.
+SQL> create table pizza (pizza_id varchar2(4) constraint pizza_id_pk primary key,
+  2  			     pizza_type varchar2(15),
+  3  			     unit_price number(4));
+
+Table created.
+
+SQL> 
+SQL> Rem:Creating the orders table with order_no as primary key and cust_id referenced to cust_id of customer table.
+SQL> create table orders (order_no varchar2(5) constraint order_no_pk primary key,
+  2  			     cust_id varchar2(4) constraint cust_id_fk references customer(cust_id),
+  3  			     order_date date,
+  4  			     delv_date date);
+
+Table created.
+
+SQL> 
+SQL> Rem:Creating the order_list table with order_no referenced to order_no of order table and
+SQL> Rem: pizza_id referenced to pizza_id of pizza table.
+SQL> create table order_list (order_no varchar2(5) constraint order_no_fk references orders(order_no),
+  2  				   pizza_id varchar2(4) constraint pizza_id_fk references pizza(pizza_id),
+  3  				   qty number(2),
+  4  				   constraint pz_pk4 primary key(order_no,pizza_id));
+
+Table created.
+
+SQL> 
+SQL> Rem:Inserting the values to the table.
+SQL> @ C:\Users\gokhu\Desktop\db\Pizza_DB.sql
+SQL> --*****************************************************
+SQL> --UCS1412				     B.Senthil Kumar
+SQL> --Database Lab			     Asst. Prof
+SQL> -- 			 Computer Science Department
+SQL> -- 			  SSN College of Engineering
+SQL> -- 				  senthil@ssn.edu.in
+SQL> --*****************************************************
+SQL> -- 	       PIZZA ORDERING DATASET
+SQL> -- 		Version 1.0
+SQL> -- 	       February 05, 2015
+SQL> --*****************************************************
+SQL> --Sources:
+SQL> -- 	This dataset is prepared for the assignment
+SQL> --      on DML, PL/SQL blocks in Database Programming.
+SQL> --      This is a test dataset - pizza ordered on 28 & 29th Jun 2015.
+SQL> --      Do NOT MODIFY the instances.
+SQL> --
+SQL> --******************************************************
+SQL> 
+SQL> 
+SQL> REm customer(cust_id, cust_name, address, phone)
+SQL> REM pizza (pizza_id, pizza_type, unit_price)
+SQL> REM orders(order_no, cust_id, order_date ,delv_date, total_amt)
+SQL> REM order_list(order_no, pizza_id, qty)
+SQL> 
+SQL> 
+SQL> --*****************************************************************************************************************************
+> 
+SQL> REM customer(cust_id, cust_name,address,phone)
+SQL> 
+SQL> insert into customer values('c001','Hari','32 RING ROAD,ALWARPET',9001200031);
+
+1 row created.
+
+SQL> insert into customer values('c002','Ashok','42 bull ROAD,numgambakkam',9444120003);
+
+1 row created.
+
+SQL> insert into customer values('c003','Raj','12a RING ROAD,ALWARPET',9840112003);
+
+1 row created.
+
+SQL> insert into customer values('c004','Raghu','P.H ROAD,Annanagar',9845712993);
+
+1 row created.
+
+SQL> insert into customer values('c005','Sindhu','100 feet ROAD,vadapalani',9840166677);
+
+1 row created.
+
+SQL> insert into customer values('c006','Brinda','GST ROAD, TAMBARAM', 9876543210);
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> REM pizza (pizza_id, pizza_type, unit_price)
+SQL> 
+SQL> insert into pizza values('p001','pan',130);
+
+1 row created.
+
+SQL> insert into pizza values('p002','grilled',230);
+
+1 row created.
+
+SQL> insert into pizza values('p003','italian',200);
+
+1 row created.
+
+SQL> insert into pizza values('p004','spanish',260);
+
+1 row created.
+
+SQL> 
+SQL> REM insert into pizza values('p005','supremo',250);
+SQL> 
+SQL> 
+SQL> 
+SQL> REM orders(order_no, cust_id, order_date ,delv_date)
+SQL> 
+SQL> insert into orders values('OP100','c001','28-JUN-2015','30-JUN-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP200','c002','28-JUN-2015','30-JUN-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP300','c003','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP400','c004','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP500','c001','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP600','c002','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> REM order_list(order_no, pizza_id, qty)
+SQL> 
+SQL> insert into order_list values('OP100','p001',3);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p002',2);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p003',1);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p004',5);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP200','p003',2);
+
+1 row created.
+
+SQL> insert into order_list values('OP200','p001',6);
+
+1 row created.
+
+SQL> insert into order_list values('OP200','p004',8);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP300','p003',3);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP400','p001',3);
+
+1 row created.
+
+SQL> insert into order_list values('OP400','p004',1);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP500','p003',6);
+
+1 row created.
+
+SQL> insert into order_list values('OP500','p004',5);
+
+1 row created.
+
+SQL> insert into order_list values('OP500','p001',null);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP600','p002',3);
+
+1 row created.
+
+SQL> 
+SQL> --******************************************************
+SQL> set serveroutput on;
+SQL> set linesize 150;
+SQL> 
+SQL> --*****************************************************************************************************************************
+SQL> Rem:Displaying the customer table
+SQL> select * from customer;
+
+CUST CUST_NAME            ADDRESS                             PHONE
+---- -------------------- ------------------------------ ----------
+c001 Hari                 32 RING ROAD,ALWARPET          9001200031
+c002 Ashok                42 bull ROAD,numgambakkam      9444120003
+c003 Raj                  12a RING ROAD,ALWARPET         9840112003
+c004 Raghu                P.H ROAD,Annanagar             9845712993
+c005 Sindhu               100 feet ROAD,vadapalani       9840166677
+c006 Brinda               GST ROAD, TAMBARAM             9876543210
+
+6 rows selected.
+
+SQL> Rem:Displaying the pizza table
+SQL> select * from pizza;
+
+PIZZ PIZZA_TYPE      UNIT_PRICE
+---- --------------- ----------
+p001 pan                    130
+p002 grilled                230
+p003 italian                200
+p004 spanish                260
+
+SQL> Rem:Displaying the order table
+SQL> select * from orders;
+
+ORDER CUST ORDER_DAT DELV_DATE
+----- ---- --------- ---------
+OP100 c001 28-JUN-15 30-JUN-15
+OP200 c002 28-JUN-15 30-JUN-15
+OP300 c003 29-JUN-15 01-JUL-15
+OP400 c004 29-JUN-15 01-JUL-15
+OP500 c001 29-JUN-15 01-JUL-15
+OP600 c002 29-JUN-15 01-JUL-15
+
+6 rows selected.
+
+SQL> Rem:Displaying the order_list table
+SQL> select * from order_list;
+
+ORDER PIZZ        QTY
+----- ---- ----------
+OP100 p001          3
+OP100 p002          2
+OP100 p003          1
+OP100 p004          5
+OP200 p003          2
+OP200 p001          6
+OP200 p004          8
+OP300 p003          3
+OP400 p001          3
+OP400 p004          1
+OP500 p003          6
+
+ORDER PIZZ        QTY
+----- ---- ----------
+OP500 p004          5
+OP500 p001
+OP600 p002          3
+
+14 rows selected.
+
+SQL>
+
+SQL> --*****************************************************************************************************************************
+SQL> Rem:1(A). Checking whether the given pizza type is available.
+SQL> 
+SQL> declare
+  2  	   pizza_name pizza.pizza_type%type;
+  3  	   num number(2);
+  4  begin
+  5  	   pizza_name:='&pizza_name';
+  6  	   select count(*) into num from pizza where pizza_type=pizza_name and rownum=1 ;
+  7  	   if(num>0) then
+  8  		 dbms_output.put_line(pizza_name||' is available.');
+  9  	   else
+ 10  		 dbms_output.put_line(pizza_name||' is not available.');
+ 11  	   end if;
+ 12  end;
+ 13  /
+Enter value for pizza_name: pan
+old   5:       pizza_name:='&pizza_name';
+new   5:       pizza_name:='pan';
+pan is available.                                                                                                                                     
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> 
+SQL> Rem:1(B). Checking whether the given pizza type is available. If not appropriate message is displayed.
+SQL> 
+SQL> declare
+  2  	   pizza_name pizza.pizza_type%type;
+  3  	   num number(2);
+  4  begin
+  5  	   pizza_name:='&pizza_name';
+  6  	   select count(*) into num from pizza where pizza_type=pizza_name and rownum=1 ;
+  7  	   if(num>0) then
+  8  		 dbms_output.put_line(pizza_name||' pizza type is available.');
+  9  	   else
+ 10  		 dbms_output.put_line(pizza_name||' pizza type is not available.');
+ 11  	   end if;
+ 12  end;
+ 13  /
+Enter value for pizza_name: non_pan
+old   5:       pizza_name:='&pizza_name';
+new   5:       pizza_name:='non_pan';
+non_pan pizza type is not available.                                                                                                                  
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> 
+SQL> Rem:2(A). For the given customer name and a range of order date, find whether a customer had
+SQL> Rem:placed any order, if so display the number of orders placed by the customer along
+SQL> Rem:with the order number(s).
+SQL> Rem:correct inputs
+SQL> 
+SQL> declare
+  2  	   order_id orders%rowtype;
+  3  	   c_name customer.cust_name%type;
+  4  	   c_id customer.cust_id%type;
+  5  	   order_start_date orders.order_date%type;
+  6  	   order_finish_date orders.order_date%type;
+  7  	   cursor cursor2 is select * from orders;
+  8  	   num number(2);
+  9  begin
+ 10  	   c_name:='&c_name';
+ 11  	   select count(*) into num from customer where cust_name=c_name and rownum=1;
+ 12  	   if(num=0) then
+ 13  		 dbms_output.put_line(c_name||' is not present in the database.');
+ 14  		 return;
+ 15  	   end if;
+ 16  	   order_start_date:='&order_start_date';
+ 17  	   order_finish_date:='&order_finish_date';
+ 18  	   select cust_id into c_id from customer where cust_name=c_name and rownum=1;
+ 19  	   select count(*) into num from orders where cust_id=c_id;
+ 20  	   if(num=0) then
+ 21  		 dbms_output.put_line(c_name||' has not ordered any pizza.');
+ 22  		 return;
+ 23  	   end if;
+ 24  	   num:=0;
+ 25  	   open cursor2;
+ 26  	   loop
+ 27  		 fetch cursor2 into order_id;
+ 28  		 if(cursor2%notfound) then
+ 29  		       exit;
+ 30  		 end if;
+ 31  		 if(order_id.order_date>=order_start_date and order_id.order_date<=order_finish_date and order_id.cust_id=c_id) then
+ 32  		       dbms_output.put_line('Order No.:'||order_id.order_no);
+ 33  		       num:=num+1;
+ 34  		 end if;
+ 35  	   end loop;
+ 36  	   close cursor2;
+ 37  	   dbms_output.put_line(c_name||' has '||num||' order(s).');
+ 38  end;
+ 39  /
+Rem:Correct input
+Enter value for c_name: Hari
+old  10:       c_name:='&c_name';
+new  10:       c_name:='Hari';
+Enter value for order_start_date: 1-JUN-2015
+old  16:       order_start_date:='&order_start_date';
+new  16:       order_start_date:='1-JUN-2015';
+Enter value for order_finish_date: 29-JUL-2015
+old  17:       order_finish_date:='&order_finish_date';
+new  17:       order_finish_date:='29-JUL-2015';
+Order No.:OP100                                                                                                                                       
+Order No.:OP500                                                                                                                                       
+Hari has 2 order(s).                                                                                                                                  
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> 
+SQL> Rem:2(B). For the given customer name and a range of order date, find whether a customer had
+SQL> Rem:placed any order, if so display the number of orders placed by the customer along
+SQL> Rem:with the order number(s).
+SQL> Rem:incorrect inputs
+SQL> 
+SQL> declare
+  2  	   order_id orders%rowtype;
+  3  	   c_name customer.cust_name%type;
+  4  	   c_id customer.cust_id%type;
+  5  	   order_start_date orders.order_date%type;
+  6  	   order_finish_date orders.order_date%type;
+  7  	   cursor cursor2 is select * from orders;
+  8  	   num number(2);
+  9  begin
+ 10  	   c_name:='&c_name';
+ 11  	   select count(*) into num from customer where cust_name=c_name and rownum=1;
+ 12  	   if(num=0) then
+ 13  		 dbms_output.put_line(c_name||' is not present in the database.');
+ 14  		 return;
+ 15  	   end if;
+ 16  	   order_start_date:='&order_start_date';
+ 17  	   order_finish_date:='&order_finish_date';
+ 18  	   select cust_id into c_id from customer where cust_name=c_name and rownum=1;
+ 19  	   select count(*) into num from orders where cust_id=c_id;
+ 20  	   if(num=0) then
+ 21  		 dbms_output.put_line(c_name||' has not ordered any pizza.');
+ 22  		 return;
+ 23  	   end if;
+ 24  	   num:=0;
+ 25  	   open cursor2;
+ 26  	   loop
+ 27  		 fetch cursor2 into order_id;
+ 28  		 if(cursor2%notfound) then
+ 29  		       exit;
+ 30  		 end if;
+ 31  		 if(order_id.order_date>=order_start_date and order_id.order_date<=order_finish_date and order_id.cust_id=c_id) then
+ 32  		       dbms_output.put_line('Order No.:'||order_id.order_no);
+ 33  		       num:=num+1;
+ 34  		 end if;
+ 35  	   end loop;
+ 36  	   close cursor2;
+ 37  	   dbms_output.put_line(c_name||' has '||num||' order(s).');
+ 38  end;
+ 39  /
+Rem: wrong name
+Enter value for c_name: gokhul
+old  10:       c_name:='&c_name';
+new  10:       c_name:='gokhul';
+Enter value for order_start_date: 1-JUN-2015
+old  16:       order_start_date:='&order_start_date';
+new  16:       order_start_date:='1-JUN-2015';
+Enter value for order_finish_date: 29-JUL-2015
+old  17:       order_finish_date:='&order_finish_date';
+new  17:       order_finish_date:='29-JUL-2015';
+gokhul is not present.                                                                                                                                    
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+
+SQL> Rem:2(c). For the given customer name and a range of order date, find whether a customer had
+SQL> Rem:placed any order, if so display the number of orders placed by the customer along
+SQL> Rem:with the order number(s).
+SQL>
+SQL> declare
+  2        order_id orders%rowtype;
+  3        c_name customer.cust_name%type;
+  4        c_id customer.cust_id%type;
+  5        order_start_date orders.order_date%type;
+  6        order_finish_date orders.order_date%type;
+  7        cursor c2 is select * from orders;
+  8        num number(2);
+  9  begin
+ 10        c_name:='&c_name';
+ 11        select count(*) into num from customer where cust_name=c_name and rownum=1;
+ 12        if(num=0) then
+ 13              dbms_output.put_line(c_name||' is not present.');
+ 14              return;
+ 15        end if;
+ 16        order_start_date:='&order_start_date';
+ 17        order_finish_date:='&order_finish_date';
+ 18        select cust_id into c_id from customer where cust_name=c_name and rownum=1;
+ 19        select count(*) into num from orders where cust_id=c_id;
+ 20        if(num=0) then
+ 21              dbms_output.put_line(c_name||' has not ordered any pizza.');
+ 22              return;
+ 23        end if;
+ 24        num:=0;
+ 25        open c2;
+ 26        loop
+ 27              fetch c2 into order_id;
+ 28              if(c2%notfound) then
+ 29                    exit;
+ 30              end if;
+ 31              if(order_id.order_date>=order_start_date and order_id.order_date<=order_finish_date and order_id.cust_id=c_id) then
+ 32                    dbms_output.put_line('Order No.:'||order_id.order_no);
+ 33                    num:=num+1;
+ 34              end if;
+ 35        end loop;
+ 36        close c2;
+ 37        dbms_output.put_line(c_name||' has '||num||' order(s).');
+ 38  end;
+ 39  /
+Rem:wrong dates
+Enter value for c_name: Hari
+old  10:       c_name:='&c_name';
+new  10:       c_name:='Hari';
+Enter value for order_start_date: 1-JAN-2015
+old  16:       order_start_date:='&order_start_date';
+new  16:       order_start_date:='1-JAN-2015';
+Enter value for order_finish_date: 30-JAN-2015
+old  17:       order_finish_date:='&order_finish_date';
+new  17:       order_finish_date:='30-JAN-2015';
+Hari has not ordered any pizza.
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> 
+SQL> Rem:3(A). Display the customer name along with the details of pizza type and its quantity
+SQL> Rem:ordered for the given order number. Also find the total quantity ordered for the given
+SQL> Rem:order number.
+SQL> Rem:correct inputs
+SQL> 
+SQL> declare
+  2  	   order_id orders.order_no%type;
+  3  	   pz_type pizza.pizza_type%type;
+  4  	   ord_det order_list%rowtype;
+  5  	   c_name customer.cust_name%type;
+  6  	   cursor cursor3 is select * from order_list;
+  7  	   tot number(2);
+  8  begin
+  9  	   order_id:='&order_id';
+ 10  	   select count(*) into tot from orders where order_no=order_id and rownum=1;
+ 11  	   if(tot=0) then
+ 12  		 dbms_output.put_line(order_id||' is not present in the database.');
+ 13  		 return;
+ 14  	   end if;
+ 15  	   select cust_name into c_name from customer where cust_id=(select cust_id from orders where order_no=order_id and rownum=1);
+ 16  	   dbms_output.put_line('Customer name: '||c_name);
+ 17  	   tot:=0;
+ 18  	   open cursor3;
+ 19  	   dbms_output.put_line('PIZZA TYPE    '||'QTY');
+ 20  	   loop
+ 21  		 fetch cursor3 into ord_det;
+ 22  		 if(cursor3%notfound) then
+ 23  		       exit;
+ 24  		 end if;
+ 25  		 if(ord_det.order_no=order_id) then
+ 26  		       select pizza_type into pz_type from pizza where pizza_id=ord_det.pizza_id;
+ 27  		       dbms_output.put_line(pz_type||lpad(ord_det.qty,10));
+ 28  		       if(ord_det.qty is not null) then
+ 29  			     tot:=tot+ord_det.qty;
+ 30  		       end if;
+ 31  		 end if;
+ 32  	   end loop;
+ 33  	   close cursor3;
+ 34  	   dbms_output.put_line('-----------------');
+ 35  	   dbms_output.put_line('Total Qty: '||tot);
+ 36  end;
+ 37  /
+Rem: correct input
+Enter value for order_id: OP100
+old   9:       order_id:='&order_id';
+new   9:       order_id:='OP100';
+Customer name: Hari                                                                                                                                   
+PIZZA TYPE    QTY                                                                                                                                     
+pan         3                                                                                                                                         
+grilled         2                                                                                                                                     
+italian         1                                                                                                                                     
+spanish         5                                                                                                                                     
+-----------------                                                                                                                                     
+Total Qty: 11                                                                                                                                         
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> Rem:3(B). Display the customer name along with the details of pizza type and its quantity
+SQL> Rem:ordered for the given order number. Also find the total quantity ordered for the given
+SQL> Rem:order number.
+SQL> Rem:incorrect inputs
+SQL> 
+SQL> declare
+  2  	   order_id orders.order_no%type;
+  3  	   pz_type pizza.pizza_type%type;
+  4  	   ord_det order_list%rowtype;
+  5  	   c_name customer.cust_name%type;
+  6  	   cursor c3 is select * from order_list;
+  7  	   tot number(2);
+  8  begin
+  9  	   order_id:='&order_id';
+ 10  	   select count(*) into tot from orders where order_no=order_id and rownum=1;
+ 11  	   if(tot=0) then
+ 12  		 dbms_output.put_line(order_id||' is not present.');
+ 13  		 return;
+ 14  	   end if;
+ 15  	   select cust_name into c_name from customer where cust_id=(select cust_id from orders where order_no=order_id and rownum=1);
+ 16  	   dbms_output.put_line('Customer name: '||c_name);
+ 17  	   tot:=0;
+ 18  	   open c3;
+ 19  	   dbms_output.put_line('PIZZA TYPE    '||'QTY');
+ 20  	   loop
+ 21  		 fetch c3 into ord_det;
+ 22  		 if(c3%notfound) then
+ 23  		       exit;
+ 24  		 end if;
+ 25  		 if(ord_det.order_no=order_id) then
+ 26  		       select pizza_type into pz_type from pizza where pizza_id=ord_det.pizza_id;
+ 27  		       dbms_output.put_line(pz_type||lpad(ord_det.qty,10));
+ 28  		       if(ord_det.qty is not null) then
+ 29  			     tot:=tot+ord_det.qty;
+ 30  		       end if;
+ 31  		 end if;
+ 32  	   end loop;
+ 33  	   close c3;
+ 34  	   dbms_output.put_line('-----------------');
+ 35  	   dbms_output.put_line('Total Qty: '||tot);
+ 36  end;
+ 37  /
+Rem:Wrong input
+Enter value for order_id: OP900
+old   9:       order_id:='&order_id';
+new   9:       order_id:='OP900';
+OP900 is not present.                                                                                                                                 
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> 
+SQL> Rem:4. Display the total number of orders that contains one pizza type, two pizza type and
+SQL> Rem:so on.
+SQL> 
+SQL> declare
+  2  	   tot number(2);
+  3  	   no number(2);
+  4  	   types number(2);
+  5  	   cursor cursor4 is select count(*) from order_list group by order_no;
+  6  	   cur_no number(2);
+  7  begin
+  8  	   select count(*) into types from pizza;
+  9  	   no:=1;
+ 10  	   while(no<=types)
+ 11  	   loop
+ 12  		 tot:=0;
+ 13  		 open cursor4;
+ 14  		 loop
+ 15  		       fetch cursor4 into cur_no;
+ 16  		       if(cursor4%notfound) then
+ 17  			     exit;
+ 18  		       end if;
+ 19  		       if(cur_no=no) then
+ 20  			     tot:=tot+1;
+ 21  		       end if;
+ 22  		 end loop;
+ 23  		 close cursor4;
+ 24  		 if(no=1) then
+ 25  		       dbms_output.put_line('Only ONE Pizza'||' types:	'||tot);
+ 26  		 end if;
+ 27  		 if(no=2) then
+ 28  		       dbms_output.put_line('Two Pizza'||' types:	'||tot);
+ 29  		 end if;
+ 30  		 if(no=3) then
+ 31  		       dbms_output.put_line('Three Pizza'||' types:	'||tot);
+ 32  		 end if;
+ 33  		 if(no>3) then
+ 34  		       dbms_output.put_line('All Pizza'||' types:	'||tot);
+ 35  		 end if;
+ 36  		 no:=no+1;
+ 37  	   end loop;
+ 38  end;
+ 39  /
+Only ONE Pizza types:  2                                                                                                                              
+Two Pizza types:       1                                                                                                                              
+Three Pizza types:     2                                                                                                                              
+All Pizza types:       1                                                                                                                              
+
+PL/SQL procedure successfully completed.
+
+SQL> --*****************************************************************************************************************************
+SQL> spool off;
